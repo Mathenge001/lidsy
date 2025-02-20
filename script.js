@@ -1,4 +1,4 @@
-window.onload = function() {
+  window.onload = function() {
             let canvas = document.getElementById('scratch-canvas');
             let ctx = canvas.getContext('2d');
             let scratchCard = document.getElementById('scratch-card');
@@ -14,8 +14,8 @@ window.onload = function() {
             function scratch(e) {
                 if (!isDrawing) return;
                 let rect = canvas.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
+                let x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                let y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.beginPath();
                 ctx.arc(x, y, 20, 0, Math.PI * 2);
@@ -38,6 +38,13 @@ window.onload = function() {
             canvas.addEventListener('mousedown', () => isDrawing = true);
             canvas.addEventListener('mouseup', () => isDrawing = false);
             canvas.addEventListener('mousemove', (e) => {
+                scratch(e);
+                checkScratchCompletion();
+            });
+            canvas.addEventListener('touchstart', () => isDrawing = true);
+            canvas.addEventListener('touchend', () => isDrawing = false);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
                 scratch(e);
                 checkScratchCompletion();
             });
