@@ -1,20 +1,89 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Untitled</title>
-  <link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>style.css</style>
-    <title>Happy Birthday!</title>
+    <title>Happy Birthday, Sis!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #1E3A8A, #2563EB, #60A5FA, #BFDBFE);
+            color: #333;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .joke {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .scratch-card {
+            width: 300px;
+            height: 150px;
+            background: gray;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            position: relative;
+            user-select: none;
+            overflow: hidden;
+        }
+        .scratch-card canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .gift-box {
+            display: none;
+            margin: auto;
+            cursor: pointer;
+            animation: heartbeat 1.5s infinite;
+        }
+        .gift-box img {
+            width: 100px;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+        }
+        .popup a {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d81b60;
+            text-decoration: none;
+        }
+        .close-btn {
+            display: block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+   <title>Happy Birthday!</title>
    
 </head>
 <body>
@@ -29,8 +98,7 @@
         <p>scratch to reveal</p>
         <div class="scratch-card" id="scratch-card">
             <div class="gift-box" id="gift-box" onclick="showPopup()">
-         <img src="https://i.pinimg.com/736x/61/67/f8/6167f8e66c12a46cfd764831f2493254.jpg" alt="Gift Box">
-
+                <img src="https://i.pinimg.com/736x/61/67/f8/6167f8e66c12a46cfd764831f2493254.jpg" alt="Gift Box">
                 <p>Tap to Open</p>
             </div>
             <canvas id="scratch-canvas"></canvas>
@@ -45,12 +113,66 @@
         <h2>Special Song Dedication 🎵</h2>
         <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7pT6WSg4PCt4mr5ZFyUfsF?utm_source=generator" width="300" height="80" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
     </div>
+    
+    <script>
+        window.onload = function() {
+            let canvas = document.getElementById('scratch-canvas');
+            let ctx = canvas.getContext('2d');
+            let scratchCard = document.getElementById('scratch-card');
+            let giftBox = document.getElementById('gift-box');
 
-  <script>script.js</script>
-</body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
+            canvas.width = scratchCard.offsetWidth;
+            canvas.height = scratchCard.offsetHeight;
+            ctx.fillStyle = 'gray';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            let isDrawing = false;
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                let rect = canvas.getBoundingClientRect();
+                let x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                let y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function checkScratchCompletion() {
+                let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let pixels = imageData.data;
+                let cleared = 0;
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0) cleared++;
+                }
+                if (cleared > pixels.length * 0.6 / 4) {
+                    canvas.style.display = 'none';
+                    giftBox.style.display = 'block';
+                }
+            }
+
+            canvas.addEventListener('mousedown', () => isDrawing = true);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mousemove', (e) => {
+                scratch(e);
+                checkScratchCompletion();
+            });
+            canvas.addEventListener('touchstart', () => isDrawing = true);
+            canvas.addEventListener('touchend', () => isDrawing = false);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                scratch(e);
+                checkScratchCompletion();
+            });
+        };
+
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+        }
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
